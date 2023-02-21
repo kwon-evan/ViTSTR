@@ -1,5 +1,8 @@
 saved_models/**
 *_dataset/**
+lightning_logs/**
+wandb/**
+*.csv
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
