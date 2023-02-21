@@ -1,14 +1,13 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="LPRNet",
+    name="ViTSTR",
     version="0.0.4",
     author="Heonjin Kwon",
     author_email="kwon@4ind.co.kr",
-    description="A Package for license plate recognition written in pytorch-lightning",
-    keywords=["pytorch", "pytorch-lightning", "license-plate-recognition"],
+    description="ViTSTR written in pytorch-lightning",
+    keywords=["pytorch", "pytorch-lightning", "license-plate-recognition", "OCR"],
     install_requires=[
-        # LPRNet requirements
         "pytorch-lightning>=1.7.0, <=1.9.0",
         "numpy>=1.17.1",
         "Pillow==9.4.0",
