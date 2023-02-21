@@ -1,5 +1,5 @@
 ### Training Configuration ###
-exp_name         :                                        # Where to store logs and models
+exp_name         : # Where to store logs and models
 train_data       : indonesia_dataset/train                # path to train dataset
 valid_data       : indonesia_dataset/valid                # path to valid dataset
 test_data        : indonesia_dataset/test                 # path to test dataset
@@ -15,7 +15,8 @@ beta1            : 0.9                                    # beta1 for adam. defa
 rho              : 0.95                                   # decay rate rho for Adadelta. default=0.95
 eps              : .00000001                              # eps for Adadelta. default=1e-8
 grad_clip        : 5                                      # gradient clipping value. default=5
-scheduler        : true
+scheduler        : true                                   # use scheduler or not
+swa_lrs          : .01                                    # stochastic weight averaging learning rate.
 
 ### Data processing ###
 batch_max_length : 10                                     # maximum-label-length

@@ -62,7 +62,7 @@ def train(opt):
                 patience=30,
                 verbose=True,
             ),
-            StochasticWeightAveraging(swa_lrs=0.01, swa_epoch_start=30),
+            StochasticWeightAveraging(swa_lrs=opt.swa_lrs),
         ],
         # logger=WandbLogger(project="ViTSTR"),
     )
