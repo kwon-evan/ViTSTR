@@ -41,9 +41,6 @@ class TokenLabelConverter(object):
         # [GO] for the start token of the attention decoder. [s] for end-of-sentence token.
         self.SPACE = "[s]"
         self.GO = "[GO]"
-        # self.MASK = '[MASK]'
-
-        # self.list_token = [self.GO, self.SPACE, self.MASK]
         self.list_token = [self.GO, self.SPACE]
         self.character = self.list_token + list(opt.character)
 

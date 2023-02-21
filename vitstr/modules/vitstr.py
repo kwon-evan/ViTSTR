@@ -103,7 +103,6 @@ def load_pretrained(
         _logger.warning("Pretrained model URL is invalid, using random initialization.")
         return
 
-    print(cfg)
     state_dict = model_zoo.load_url(cfg["url"], progress=True, map_location="cpu")
     if "model" in state_dict.keys():
         state_dict = state_dict["model"]
