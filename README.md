@@ -13,30 +13,48 @@ ViTSTR is also fast due to the parallel computation inherent to ViT architecture
 
 ViTSTR is built using a fork of [CLOVA AI Deep Text Recognition Benchmark](https://github.com/clovaai/deep-text-recognition-benchmark). Below we document how to train and evaluate ViTSTR-Tiny and ViTSTR-small.
 
-### Install
+-----------------
 
+## How to use this
+You can modify `config.yaml` as you want.
+suggest you to check `config.yaml` before using ViTSTR.
+
+before test or predict, you can use pre-trained model as follow;
+```bash
+mkdir saved_models && wget https://github.com/kwon-evan/ViTSTR/releases/download/v0.0.1/best.ckpt -P ./saved_models --no-check-certificate
 ```
+
+### Install
+```shell
 python3 setup.py install
 ```
 
-### Quick validation using a pre-trained model 
-
-ViTSTR-Small
-
+### Train
+```shell
+python3 scripts/train.py
 ```
+
+### Test
+```shell
+python3 scripts/test.py
+```
+
+### Predict
+
+```shell
 python3 scripts/predict.py
-# or
+```
+or
+```shell
 python3 scripts/predict_each.py
 ```
 
-Available model weights:
+### Heatmap(Attention CAM)
+```shell
+python3 scripts/cam.py
+```
 
-| Tiny | Small  | Base |
-| :---: | :---: | :---: |
-| `vitstr_tiny_patch16_224` | `vitstr_small_patch16_224` | `vitstr_base_patch16_224`|
-|[ViTSTR-Tiny](https://github.com/roatienza/deep-text-recognition-benchmark/releases/download/v0.1.0/vitstr_tiny_patch16_224.pth)|[ViTSTR-Small](https://github.com/roatienza/deep-text-recognition-benchmark/releases/download/v0.1.0/vitstr_small_patch16_224.pth)|[ViTSTR-Base](https://github.com/roatienza/deep-text-recognition-benchmark/releases/download/v0.1.0/vitstr_base_patch16_224.pth)|
-|[ViTSTR-Tiny+Aug](https://github.com/roatienza/deep-text-recognition-benchmark/releases/download/v0.1.0/vitstr_tiny_patch16_224_aug.pth)|[ViTSTR-Small+Aug](https://github.com/roatienza/deep-text-recognition-benchmark/releases/download/v0.1.0/vitstr_small_patch16_224_aug.pth)|[ViTSTR-Base+Aug](https://github.com/roatienza/deep-text-recognition-benchmark/releases/download/v0.1.0/vitstr_base_patch16_224_aug.pth)|
-
+-----------------
 
 ### Benchmarks (Top 1% accuracy)
 
@@ -63,20 +81,6 @@ Available model weights:
 
 #### Accuracy vs FLOPS
 ![Acc vs FLOPS](https://github.com/roatienza/deep-text-recognition-benchmark/raw/master/scripts/paper/Accuracy_vs_GFLOPS.png)
-
-### Train
-```bash
-python3 scripts/train.py
-```
-
-### Test
-
-ViTSTR-Tiny. Find the path to `best_accuracy.pth` checkpoint file (usually in `saved_models` folder).
-
-```bash
-python3 scripts/test.py
-```
-
 
 ## Citation
 If you find this work useful, please cite:
