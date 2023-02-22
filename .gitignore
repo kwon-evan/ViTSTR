@@ -2,6 +2,8 @@ saved_models/**
 *_dataset/**
 lightning_logs/**
 wandb/**
+cam/**
+warped/**
 *.csv
 
 # Byte-compiled / optimized / DLL files
