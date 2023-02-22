@@ -49,7 +49,7 @@ if __name__ == "__main__":
         # print(opt.exp_name)
 
     """ Seed and GPU setting """
-    pl.seed_everything()
+    pl.seed_everything(opt.manualSeed)
 
     cudnn.benchmark = True
     cudnn.deterministic = True

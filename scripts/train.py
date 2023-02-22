@@ -30,9 +30,10 @@ def train(opt):
     dm = DataModule(opt)
     model = Model(opt)
 
-    if opt.saved_model != "":
+    if opt.saved_model:
         try:
-            model.load_from_checkpoint(opt.saved_model)
+            # model.load_from_checkpoint(opt.saved_model)
+            model = Model.load_from_checkpoint(opt.saved_model, opt=opt)
             print(f"continue to train, from {opt.saved_model}")
         except:
             pass
@@ -62,7 +63,9 @@ def train(opt):
                 patience=30,
                 verbose=True,
             ),
-            StochasticWeightAveraging(swa_lrs=opt.swa_lrs),
+            StochasticWeightAveraging(
+                swa_lrs=opt.swa_lrs, swa_epoch_start=opt.swa_epoch_start
+            ),
         ],
         # logger=WandbLogger(project="ViTSTR"),
     )
@@ -84,7 +87,7 @@ if __name__ == "__main__":
     os.makedirs(f"./saved_models/{opt.exp_name}", exist_ok=True)
 
     """ Seed and GPU setting """
-    pl.seed_everything()
+    pl.seed_everything(opt.manualSeed)
 
     cudnn.benchmark = True
     cudnn.deterministic = True

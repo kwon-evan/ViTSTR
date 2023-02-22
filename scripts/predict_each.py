@@ -63,7 +63,7 @@ if __name__ == "__main__":
         opt = Namespace(**opt)
 
     """ Seed and GPU setting """
-    pl.seed_everything()
+    pl.seed_everything(opt.mamualSeed)
 
     cudnn.benchmark = True
     cudnn.deterministic = True
