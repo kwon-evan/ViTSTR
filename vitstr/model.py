@@ -28,7 +28,7 @@ from nltk.metrics.distance import edit_distance
 from torch.optim.lr_scheduler import CosineAnnealingLR, CosineAnnealingWarmRestarts
 
 from vitstr.modules.transformation import TPS_SpatialTransformerNetwork
-from vitstr.modules.vitstr import create_vitstr
+from vitstr.modules.vitstr import create_vitstr, load_pretrained
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -86,7 +86,10 @@ class Model(pl.LightningModule):
         )
 
         self.vitstr = create_vitstr(
-            num_tokens=len(self.opt.character) + 2, model=self.opt.model_name
+            num_tokens=len(self.opt.character) + 2,
+            model=self.opt.model_name,
+            checkpoint_path=self.opt.saved_model,
+            load_pretrained=self.opt.load_pretrained,
         )
 
         self.converter = TokenLabelConverter(self.opt)

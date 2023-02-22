@@ -35,9 +35,12 @@ __all__ = [
 ]
 
 
-def create_vitstr(num_tokens, model=None, checkpoint_path=""):
+def create_vitstr(num_tokens, model=None, checkpoint_path="", load_pretrained=False):
     vitstr = create_model(
-        model, pretrained=True, num_classes=num_tokens, checkpoint_path=checkpoint_path
+        model,
+        pretrained=load_pretrained,
+        num_classes=num_tokens,
+        checkpoint_path=checkpoint_path,
     )
 
     # might need to run to get zero init head for transfer learning

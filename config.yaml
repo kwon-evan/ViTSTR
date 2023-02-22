@@ -4,11 +4,12 @@ train_data       : indonesia_dataset/train                # path to train datase
 valid_data       : indonesia_dataset/valid                # path to valid dataset
 test_data        : indonesia_dataset/test                 # path to test dataset
 image_folder     : indonesia_dataset/test                 # path to image folder for predict
-manualSeed       : 1111                                   # for random seed setting
+manualSeed       : 1113                                   # for random seed setting
 workers          : 24                                     # number of data loading workers
 batch_size       : 128                                    # input batch size
 num_epoch        : 1000                                   # number of iterations to train for
 saved_model      : saved_models/best.ckpt                 # path to model to continue training
+load_pretrained  : true                                   # load pretrained model before training
 adam             : false                                  # Whether to use adam (default is Adadelta)
 lr               : 1                                      # learning rate, default=1.0 for Adadelta
 beta1            : 0.9                                    # beta1 for adam. default=0.9
@@ -17,6 +18,7 @@ eps              : .00000001                              # eps for Adadelta. de
 grad_clip        : 5                                      # gradient clipping value. default=5
 scheduler        : true                                   # use scheduler or not
 swa_lrs          : .01                                    # stochastic weight averaging learning rate.
+swa_epoch_start  : 30
 
 ### Data processing ###
 batch_max_length : 10                                     # maximum-label-length
