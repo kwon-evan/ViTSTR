@@ -1,6 +1,4 @@
 import os
-from argparse import Namespace
-import yaml
 import warnings
 
 import torch
@@ -9,22 +7,17 @@ from rich import print
 from PIL import Image
 import torchvision.transforms as transforms
 
-from vitstr import Model
+from vitstr import load_ViTSTR
 
 warnings.filterwarnings(action="ignore")
 
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 SRC = "demo_images"
 DST = "warped"
 
 
-def TPS(opt):
-    if opt.saved_model == "" or os.path.exists(opt.saved_model):
-        assert f"{opt.saved_model} is not exist!"
-
-    model = Model.load_from_checkpoint(opt.saved_model, opt=opt)
-    model.eval().to(device)
-    print(f"model loaded from checkpoint {opt.saved_model}")
-
+def TPS(model, opt):
+    print("Generating warped images...")
     for img_name in sorted(os.listdir(SRC)):
         image = Image.open(f"{SRC}/{img_name}")
         image_size = image.size
@@ -44,15 +37,15 @@ def TPS(opt):
         warped = to_pil(warped)
         warped = warped.resize(image_size, Image.ANTIALIAS)
         warped.save(f"{DST}/{img_name}", dpi=(200, 200))
+    print("Done!")
 
 
 if __name__ == "__main__":
     """load configuration"""
-    with open("config.yaml", "r") as f:
-        opt = yaml.safe_load(f)
-        opt = Namespace(**opt)
+    model, opt = load_ViTSTR("config.yaml")
+    model.eval().freeze()
 
     os.makedirs(DST, exist_ok=True)
+    print("warped images will be saved in", DST)
 
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    TPS(opt)
+    TPS(model, opt)

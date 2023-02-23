@@ -1,21 +1,14 @@
 import os
-from argparse import Namespace
-from os.path import exists
-import yaml
-import warnings
 import numpy as np
 import cv2
 from PIL import Image
 
 import torch
-import torch.backends.cudnn as cudnn
 import torch.utils.data
 import torchvision.transforms as transforms
 import pytorch_lightning as pl
 
-from vitstr import Model
-
-warnings.filterwarnings(action="ignore")
+from vitstr import load_ViTSTR
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -110,7 +103,7 @@ def img_transform(model, image):
     to_tensor = transforms.ToTensor()
     to_pil = transforms.ToPILImage()
 
-    image = image.resize((opt.imgW, opt.imgH), Image.ANTIALIAS).convert("L")
+    image = image.resize((opt.imgW, opt.imgH), Image.LANCZOS).convert("L")
     image = to_tensor(image).to(device).unsqueeze(0)
     image.sub_(0.5).div_(0.5)  # Image Normalize
 
@@ -120,26 +113,17 @@ def img_transform(model, image):
     warped = warped.squeeze(0)
     warped.mul_(0.5).add_(0.5)
     warped = to_pil(warped)
-    warped = warped.resize(image_size, Image.ANTIALIAS)
+    warped = warped.resize(image_size, Image.LANCZOS)
     warped = np.array(warped)
     warped = cv2.cvtColor(warped, cv2.COLOR_RGB2BGR)
 
     return warped
 
 
-def test(opt):
-    if opt.saved_model == "" or os.path.exists(opt.saved_model):
-        assert f"{opt.saved_model} is not exist!"
-
-    print("Loding Saved:", opt.saved_model)
-    print(os.path.exists(opt.saved_model))
-    model = Model.load_from_checkpoint(opt.saved_model, opt=opt)
-    model.eval().to(device)
-    model.freeze()
-    print(f"model loaded from checkpoint {opt.saved_model}")
-
+def cam(model, opt):
     images = os.listdir("demo_images")
 
+    print("Generating CAMs...")
     for image in images:
         img_path = f"demo_images/{image}"
         image = Image.open(img_path).convert("RGB" if opt.rgb else "L")
@@ -154,27 +138,15 @@ def test(opt):
 
         _, img_name = os.path.split(img_path)
         cv2.imwrite(f"cam/{img_name}", show_mask_on_image(warped, mask))
+    print("Done!")
 
 
 if __name__ == "__main__":
     """load configuration"""
-    with open("config.yaml", "r") as f:
-        opt = yaml.safe_load(f)
-        opt = Namespace(**opt)
+    model, opt = load_ViTSTR("config.yaml")
+    model.eval().freeze()
 
-    if not os.path.exists("cam"):
-        os.makedirs("cam", exists_ok=True)
+    os.makedirs("cam", exist_ok=True)
+    print("CAM Images will be at 'cam' folder.")
 
-    if not opt.exp_name:
-        opt.exp_name = f"ViTSTR-Seed{opt.manualSeed}"
-        # print(opt.exp_name)
-
-    """ Seed and GPU setting """
-    pl.seed_everything(opt.manualSeed)
-
-    cudnn.benchmark = True
-    cudnn.deterministic = True
-
-    opt.num_gpu = torch.cuda.device_count()
-
-    test(opt)
+    cam(model, opt)
