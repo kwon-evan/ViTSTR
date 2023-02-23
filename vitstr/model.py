@@ -88,7 +88,6 @@ class Model(pl.LightningModule):
         self.vitstr = create_vitstr(
             num_tokens=len(self.opt.character) + 2,
             model=self.opt.model_name,
-            checkpoint_path=self.opt.saved_model,
             load_pretrained=self.opt.load_pretrained,
         )
 
