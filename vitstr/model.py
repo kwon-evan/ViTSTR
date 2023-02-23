@@ -16,11 +16,15 @@ limitations under the License.
 
 import os
 import math
+import yaml
+from argparse import Namespace
+from typing import Tuple
 
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
+import torch.backends.cudnn as cudnn
 import pytorch_lightning as pl
 import numpy as np
 from nltk.metrics.distance import edit_distance
@@ -301,7 +305,7 @@ class Model(pl.LightningModule):
 
         return predicts
 
-    def imread(self, image, device):
+    def imread(self, image, device=device):
         """
         Read Texts in PIL Image.
 
@@ -330,11 +334,8 @@ class Model(pl.LightningModule):
         image = image.unsqueeze(0)
 
         text_for_pred = torch.LongTensor(1, self.opt.batch_max_length + 1).fill_(0)
-        # text_for_pred = "A" * (self.opt.batch_max_length + 1)
 
         # For max length prediction
-        # target = self.converter.encode(text_for_pred)
-
         preds = self(image, text=text_for_pred, seqlen=self.converter.batch_max_length)
         _, preds_index = preds.topk(1, dim=-1, largest=True, sorted=True)
         preds_index = preds_index.view(-1, self.converter.batch_max_length)
@@ -392,3 +393,48 @@ class Model(pl.LightningModule):
             )
 
         return {"optimizer": optimizer, "lr_scheduler": scheduler}
+
+
+def load_ViTSTR(yaml_path: str) -> Tuple[Model, Namespace]:
+    """
+    Load ViTSTR model from yaml file
+    Args:
+        yaml_path(str): path to yaml file
+    Returns:
+        model: loaded or created ViTSTR model
+        opt: Namespace object with model parameters
+    """
+
+    # load Configuration
+    with open(yaml_path, "r") as f:
+        opt = Namespace(**yaml.safe_load(f))
+        print(f"Configuration file loaded from {yaml_path}")
+
+    # set experiment name if not specified
+    if not opt.exp_name:
+        opt.exp_name = f"ViTSTR-Seed{opt.manualSeed}"
+
+    # Seed and GPU settings
+    pl.seed_everything(opt.manualSeed)
+    cudnn.benchmark = True
+    cudnn.deterministic = True
+    opt.num_gpu = torch.cuda.device_count()
+
+    # Load model from checkpoint if specified in yaml file else create new model
+    if opt.saved_model:
+        if not os.path.exists(opt.saved_model):
+            raise FileNotFoundError(f"Model file {opt.saved_model} not found")
+
+        model = Model.load_from_checkpoint(opt.saved_model, opt=opt)
+        print(f"Model loaded from {opt.saved_model}")
+    else:
+        model = Model(opt)
+        print(f"Model created with {yaml_path}")
+
+    # model warm-up with dummy tensor
+    model.to(device)
+    dummy_image = torch.rand(1, 3 if opt.rgb else 1, opt.imgH, opt.imgH).to(device)
+    dummy_text = torch.LongTensor(1, opt.batch_max_length + 1).fill_(0).to(device)
+    model(dummy_image, dummy_text)
+
+    return model, opt
