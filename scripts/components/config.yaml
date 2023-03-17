@@ -6,7 +6,7 @@ workers          : 24                                     # number of data loadi
 batch_size       : 128                                    # input batch size
 
 num_epoch        : 1000                                   # number of iterations to train for
-saved_model      : saved_models/ViTSTR-Seed1113/epoch=03-val-acc=94.925.ckpt                 # path to model to continue training
+saved_model      : saved_models/ViTSTR-Seed1113/epoch=14-val-acc=98.718.ckpt                 # path to model to continue training
 adam             : false                                  # Whether to use adam (default is Adadelta)
 lr               : 1                                      # learning rate, default=1.0 for Adadelta
 beta1            : 0.9                                    # beta1 for adam. default=0.9
