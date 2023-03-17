@@ -1,6 +1,4 @@
 import os
-import random
-import string
 from argparse import Namespace
 import yaml
 import warnings
@@ -17,22 +15,33 @@ from pytorch_lightning.callbacks import (
     StochasticWeightAveraging,
 )
 from pytorch_lightning.loggers.wandb import WandbLogger
-import numpy as np
 from rich import print
 
-from vitstr import Model
-from vitstr import DataModule
+from components.datamodule import DataModule
+from components.pl_wrapper import Model
+from vitstr import ModelConfig
+
 
 warnings.filterwarnings(action="ignore")
 
 
 def train(opt):
+    cfg = ModelConfig()
+    # Merge config with opt
+    for k, v in vars(cfg).items():
+        if k not in vars(opt):
+            setattr(opt, k, v)
+    if opt.kor:
+        kor_character = "0123456789가강거경계고관광구금기김나남너노누다대더도동두등라러로루리마머명모무문미바배버보부북사산서소수시아악안양어연영오용우울원육이인자작저전조주중지차천초추충카타파평포하허호홀히"
+        opt.character = kor_character
+    opt.pretrained = True
+    print(opt)
+
     dm = DataModule(opt)
     model = Model(opt)
 
     if opt.saved_model:
         try:
-            # model.load_from_checkpoint(opt.saved_model)
             model = Model.load_from_checkpoint(opt.saved_model, opt=opt)
             print(f"continue to train, from {opt.saved_model}")
         except:
@@ -64,7 +73,8 @@ def train(opt):
                 verbose=True,
             ),
             StochasticWeightAveraging(
-                swa_lrs=opt.swa_lrs, swa_epoch_start=opt.swa_epoch_start
+                swa_lrs=opt.swa_lrs,
+                swa_epoch_start=opt.swa_epoch_start,
             ),
         ],
         # logger=WandbLogger(project="ViTSTR"),
@@ -75,14 +85,10 @@ def train(opt):
 
 if __name__ == "__main__":
     """load configuration"""
-    with open("config.yaml", "r") as f:
-        opt = yaml.safe_load(f)
-        print(opt)
-        opt = Namespace(**opt)
+    opt = Namespace(**yaml.safe_load(open("scripts/components/config.yaml", "r")))
 
     if not opt.exp_name:
         opt.exp_name = f"ViTSTR-Seed{opt.manualSeed}"
-        # print(opt.exp_name)
 
     os.makedirs(f"./saved_models/{opt.exp_name}", exist_ok=True)
 
@@ -91,7 +97,6 @@ if __name__ == "__main__":
 
     cudnn.benchmark = True
     cudnn.deterministic = True
-
     opt.num_gpu = torch.cuda.device_count()
 
     train(opt)

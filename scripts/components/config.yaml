@@ -1,16 +1,12 @@
 ### Training Configuration ###
-# Experiment
 exp_name         : # Where to store logs and models
+data_root        : "/home/fourind/projects/datas/indonesia-datas/"
 manualSeed       : 1113                                   # for random seed setting
-
-# Dataset
-data_root        : ""
 workers          : 24                                     # number of data loading workers
 batch_size       : 128                                    # input batch size
 
-# Training
 num_epoch        : 1000                                   # number of iterations to train for
-saved_model      : #saved_models/best.ckpt                 # path to model to continue training
+saved_model      : saved_models/ViTSTR-Seed1113/epoch=03-val-acc=94.925.ckpt                 # path to model to continue training
 adam             : false                                  # Whether to use adam (default is Adadelta)
 lr               : 1                                      # learning rate, default=1.0 for Adadelta
 beta1            : 0.9                                    # beta1 for adam. default=0.9
@@ -19,4 +15,6 @@ eps              : .00000001                              # eps for Adadelta. de
 grad_clip        : 5                                      # gradient clipping value. default=5
 scheduler        : true                                   # use scheduler or not
 swa_lrs          : .01                                    # stochastic weight averaging learning rate.
-swa_epoch_start  : 30
+swa_epoch_start  : 5
+pad              : false
+kor              : false                                  # use kor character

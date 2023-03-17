@@ -1,3 +1,2 @@
-from .modules import *
-from .model import Model, load_ViTSTR
-from .datamodule import DataModule
+from .model import ViTSTR
+from .config import ModelConfig
