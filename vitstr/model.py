@@ -13,6 +13,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
+from typing import Union
+from argparse import Namespace
 
 import torch
 import torch.nn as nn
@@ -65,7 +67,7 @@ class TokenLabelConverter(object):
 
 
 class ViTSTR(nn.Module):
-    def __init__(self, opt=ModelConfig()):
+    def __init__(self, opt: Union[ModelConfig, Namespace] = ModelConfig()):
         super(ViTSTR, self).__init__()
         self.opt = opt
 
@@ -146,7 +148,9 @@ class ViTSTR(nn.Module):
         return pred.upper(), confidence_score.item()
 
     @staticmethod
-    def load_from(path, opt=ModelConfig()):
+    def load_from(path: str, opt: Union[ModelConfig, Namespace] = ModelConfig()):
+        if opt.kor:
+            opt.character = "0123456789가강거경계고관광구금기김나남너노누다대더도동두등라러로루리마머명모무문미바배버보부북사산서소수시아악안양어연영오용우울원육이인자작저전조주중지차천초추충카타파평포하허호홀히"
         model = ViTSTR(opt)
         model.load_state_dict(torch.load(path, map_location=device)["state_dict"])
         return model

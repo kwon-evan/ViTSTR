@@ -4,6 +4,7 @@ from typing import Tuple
 
 @dataclass
 class ModelConfig:
+    kor: bool = False  # use Korean character or not
     rgb: bool = False  # use rgb input
     pad: bool = False  # whether to keep ratio then pad for image resize
     pretrained: bool = False  # load pretrained model
