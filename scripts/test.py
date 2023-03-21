@@ -21,7 +21,8 @@ def test(opt):
     print(opt)
 
     dm = DataModule(opt)
-    model = Model.load_from_checkpoint(opt.saved_model, opt=opt)
+    model = Model.load_from_checkpoint(opt.saved_model, opt=opt).eval()
+    model.freeze()
 
     trainer = pl.Trainer(
         accelerator="auto",
