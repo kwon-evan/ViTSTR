@@ -16,15 +16,10 @@ limitations under the License.
 
 import os
 import math
-import yaml
-from argparse import Namespace
-from typing import Tuple
 
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-import torch.backends.cudnn as cudnn
 import pytorch_lightning as pl
 import numpy as np
 from nltk.metrics.distance import edit_distance
@@ -33,47 +28,6 @@ from glob import glob
 from torch.optim.lr_scheduler import CosineAnnealingWarmRestarts
 
 from vitstr import ViTSTR
-
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-
-class TokenLabelConverter(object):
-    """Convert between text-label and text-index"""
-
-    def __init__(self, opt):
-        # character (str): set of the possible characters.
-        # [GO] for the start token of the attention decoder. [s] for end-of-sentence token.
-        self.SPACE = "[s]"
-        self.GO = "[GO]"
-        self.list_token = [self.GO, self.SPACE]
-        self.character = self.list_token + list(opt.character)
-
-        self.dict = {word: i for i, word in enumerate(self.character)}
-        self.batch_max_length = opt.batch_max_length + len(self.list_token)
-
-    def encode(self, text):
-        """convert text-label into text-index."""
-        length = [
-            len(s) + len(self.list_token) for s in text
-        ]  # +2 for [GO] and [s] at end of sentence.
-        batch_text = torch.LongTensor(len(text), self.batch_max_length).fill_(
-            self.dict[self.GO]
-        )
-        for i, t in enumerate(text):
-            txt = [self.GO] + list(t) + [self.SPACE]
-            txt = [self.dict[char] for char in txt]
-            batch_text[i][: len(txt)] = torch.LongTensor(
-                txt
-            )  # batch_text[:, 0] = [GO] token
-        return batch_text.to(device)
-
-    def decode(self, text_index, length):
-        """convert text-index into text-label."""
-        texts = []
-        for index, l in enumerate(length):
-            text = "".join([self.character[i] for i in text_index[index, :]])
-            texts.append(text)
-        return texts
 
 
 class Model(pl.LightningModule):
@@ -174,7 +128,7 @@ class Model(pl.LightningModule):
 
             # calculate confidence score (= multiply of pred_max_prob)
             try:
-                confidence_score = pred_max_prob.cumprod(dim=0)[-1].item()
+                confidence_score = pred_max_prob.cumprod(dim=0)[-1]
             except:
                 confidence_score = 0  # for empty pred case, when prune after "end of sentence" token ([s])
             confidence_score_list.append(confidence_score)
@@ -240,7 +194,7 @@ class Model(pl.LightningModule):
 
             # calculate confidence score (= multiply of pred_max_prob)
             try:
-                confidence_score = pred_max_prob.cumprod(dim=0)[-1].item()
+                confidence_score = pred_max_prob.cumprod(dim=0)[-1]
             except:
                 confidence_score = 0  # for empty pred case, when prune after "end of sentence" token ([s])
             confidence_score_list.append(confidence_score)

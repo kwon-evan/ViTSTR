@@ -13,7 +13,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-from time import process_time
 from typing import Union
 from argparse import Namespace
 
@@ -27,13 +26,11 @@ from vitstr.modules.transformation import TPS_SpatialTransformerNetwork
 from vitstr.modules.vitstr import create_vitstr
 from vitstr.config import ModelConfig
 
-# device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
 
 class TokenLabelConverter(object):
     """Convert between text-label and text-index"""
 
-    def __init__(self, opt):
+    def __init__(self, opt, device):
         # character (str): set of the possible characters.
         # [GO] for the start token of the attention decoder. [s] for end-of-sentence token.
         self.SPACE = "[s]"
@@ -43,10 +40,7 @@ class TokenLabelConverter(object):
 
         self.dict = {word: i for i, word in enumerate(self.character)}
         self.batch_max_length = opt.batch_max_length + len(self.list_token)
-
-    @property
-    def device(self):
-        return next(self.parameters()).device
+        self.device = device
 
     def encode(self, text):
         """convert text-label into text-index."""
@@ -93,7 +87,7 @@ class ViTSTR(nn.Module):
         )
 
         self.character = self.opt.character
-        self.converter = TokenLabelConverter(self.opt)
+        self.converter = TokenLabelConverter(self.opt, self.device)
 
     @property
     def device(self):
