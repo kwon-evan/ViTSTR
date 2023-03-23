@@ -262,8 +262,7 @@ def vitstr_tiny_distilled_patch16_224(pretrained=False, **kwargs):
         **kwargs
     )
     model.default_cfg = _cfg(
-        # url="https://dl.fbaipublicfiles.com/deit/deit_tiny_distilled_patch16_224-b40b3cf7.pth"
-        file="saved_models/best.ckpt"
+        url="https://dl.fbaipublicfiles.com/deit/deit_tiny_distilled_patch16_224-b40b3cf7.pth"
     )
 
     if pretrained:
@@ -291,6 +290,32 @@ def vitstr_small_distilled_patch16_224(pretrained=False, **kwargs):
     )
     model.default_cfg = _cfg(
         url="https://dl.fbaipublicfiles.com/deit/deit_small_distilled_patch16_224-649709d9.pth"
+    )
+    if pretrained:
+        load_pretrained(
+            model,
+            num_classes=model.num_classes,
+            in_chans=kwargs.get("in_chans", 1),
+            filter_fn=_conv_filter,
+        )
+    return model
+
+
+@register_model
+def vitstr_base_distilled_patch16_224(pretrained=False, **kwargs):
+    kwargs["in_chans"] = 1
+    kwargs["distilled"] = True
+    model = ViTSTR(
+        patch_size=16,
+        embed_dim=384,
+        depth=12,
+        num_heads=6,
+        mlp_ratio=4,
+        qkv_bias=True,
+        **kwargs
+    )
+    model.default_cfg = _cfg(
+        url="https://dl.fbaipublicfiles.com/deit/deit_base_distilled_patch16_224-df68dfff.pth"
     )
     if pretrained:
         load_pretrained(

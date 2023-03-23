@@ -58,16 +58,16 @@ def train(opt):
             DeviceStatsMonitor(),
             ModelCheckpoint(
                 dirpath=f"./saved_models/{opt.exp_name}",
-                monitor="val-ned",
-                mode="max",
+                monitor="val-loss",
+                mode="min",
                 filename="{epoch:02d}-{val-acc:.3f}",
                 verbose=True,
                 save_last=True,
                 save_top_k=5,
             ),
             EarlyStopping(
-                monitor="val-ned",
-                mode="max",
+                monitor="val-loss",
+                mode="min",
                 min_delta=0.00,
                 patience=30,
                 verbose=True,
@@ -77,7 +77,7 @@ def train(opt):
                 swa_epoch_start=opt.swa_epoch_start,
             ),
         ],
-        # logger=WandbLogger(project="ViTSTR"),
+        logger=WandbLogger(project="ViTSTR"),
     )
 
     trainer.fit(model, dm)

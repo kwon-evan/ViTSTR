@@ -13,18 +13,21 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
+from time import process_time
 from typing import Union
 from argparse import Namespace
 
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import torchvision.transforms as transforms
+from PIL import Image
 
 from vitstr.modules.transformation import TPS_SpatialTransformerNetwork
 from vitstr.modules.vitstr import create_vitstr
 from vitstr.config import ModelConfig
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+# device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 class TokenLabelConverter(object):
@@ -41,6 +44,10 @@ class TokenLabelConverter(object):
         self.dict = {word: i for i, word in enumerate(self.character)}
         self.batch_max_length = opt.batch_max_length + len(self.list_token)
 
+    @property
+    def device(self):
+        return next(self.parameters()).device
+
     def encode(self, text):
         """convert text-label into text-index."""
         length = [
@@ -55,7 +62,7 @@ class TokenLabelConverter(object):
             batch_text[i][: len(txt)] = torch.LongTensor(
                 txt
             )  # batch_text[:, 0] = [GO] token
-        return batch_text.to(device)
+        return batch_text.to(self.device)
 
     def decode(self, text_index, length):
         """convert text-index into text-label."""
@@ -88,6 +95,10 @@ class ViTSTR(nn.Module):
         self.character = self.opt.character
         self.converter = TokenLabelConverter(self.opt)
 
+    @property
+    def device(self):
+        return next(self.parameters()).device
+
     def forward(self, input, seqlen=25):
         """Transformation stage"""
         input = self.Transformation(input)
@@ -95,7 +106,7 @@ class ViTSTR(nn.Module):
         prediction = self.vitstr(input, seqlen=seqlen)
         return prediction
 
-    def imread(self, image, device=device):
+    def imread(self, image):
         """
         Read Texts in PIL Image.
 
@@ -108,15 +119,13 @@ class ViTSTR(nn.Module):
             confidence: model's confidence_score
             inference_time: inference_time in ms
         """
-        from PIL import Image
-        import torchvision.transforms as transforms
 
         totensor = transforms.ToTensor()
 
         if not self.opt.rgb:
             image = image.convert("L")
         image = image.resize(self.opt.img_size, Image.BICUBIC)
-        image = totensor(image).to(device)
+        image = totensor(image).to(self.device)
         image.sub_(0.5).div_(0.5)
         image = image.unsqueeze(0)
 
@@ -148,9 +157,19 @@ class ViTSTR(nn.Module):
         return pred.upper(), confidence_score.item()
 
     @staticmethod
-    def load_from(path: str, opt: Union[ModelConfig, Namespace] = ModelConfig()):
+    def load_from(
+        path: str,
+        opt: Union[ModelConfig, Namespace] = ModelConfig(),
+        device: torch.device = torch.device("cpu"),
+    ):
         if opt.kor:
             opt.character = "0123456789가강거경계고관광구금기김나남너노누다대더도동두등라러로루리마머명모무문미바배버보부북사산서소수시아악안양어연영오용우울원육이인자작저전조주중지차천초추충카타파평포하허호홀히"
         model = ViTSTR(opt)
         model.load_state_dict(torch.load(path, map_location=device)["state_dict"])
+        model.to(device)
+        model.eval()
+
+        # warm-up
+        model.imread(Image.new("RGB", (100, 32), (255, 255, 255)))
+
         return model

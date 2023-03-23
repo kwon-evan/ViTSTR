@@ -95,7 +95,6 @@ class Model(pl.LightningModule):
         """Transformation stage"""
         input = self.Transformation(input)
         prediction = self.vitstr(input, seqlen=seqlen)
-
         return prediction
 
     def training_step(self, batch, batch_idx):
@@ -175,12 +174,12 @@ class Model(pl.LightningModule):
 
             # calculate confidence score (= multiply of pred_max_prob)
             try:
-                confidence_score = pred_max_prob.cumprod(dim=0)[-1]
+                confidence_score = pred_max_prob.cumprod(dim=0)[-1].item()
             except:
                 confidence_score = 0  # for empty pred case, when prune after "end of sentence" token ([s])
             confidence_score_list.append(confidence_score)
 
-            if i < 10:
+            if i < 20:
                 print(f"{pred:15s}{gt:15s}{confidence_score:.4f}")
 
         accuracy = n_correct / float(len(preds)) * 100
@@ -241,7 +240,7 @@ class Model(pl.LightningModule):
 
             # calculate confidence score (= multiply of pred_max_prob)
             try:
-                confidence_score = pred_max_prob.cumprod(dim=0)[-1]
+                confidence_score = pred_max_prob.cumprod(dim=0)[-1].item()
             except:
                 confidence_score = 0  # for empty pred case, when prune after "end of sentence" token ([s])
             confidence_score_list.append(confidence_score)
