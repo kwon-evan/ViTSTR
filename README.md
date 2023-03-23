@@ -1,5 +1,6 @@
 # ViTSTR
 ## Vision Transformer for Fast and Efficient Scene Text Recognition
+This repo is built using a fork of [CLOVA AI Deep Text Recognition Benchmark](https://github.com/clovaai/deep-text-recognition-benchmark)
 
 ViTSTR is a simple single-stage model that uses a pre-trained Vision Transformer (ViT) to perform Scene Text Recognition (ViTSTR).
 It has a comparable accuracy with state-of-the-art STR models although it uses significantly less number of parameters and FLOPS.
@@ -11,49 +12,33 @@ ViTSTR is also fast due to the parallel computation inherent to ViT architecture
 
 ![ViTSTR Model](https://github.com/roatienza/deep-text-recognition-benchmark/raw/master/figures/vitstr_model.png)
 
-ViTSTR is built using a fork of [CLOVA AI Deep Text Recognition Benchmark](https://github.com/clovaai/deep-text-recognition-benchmark). Below we document how to train and evaluate ViTSTR-Tiny and ViTSTR-small.
-
 -----------------
+## How to
+model config is at `vitstr/config.py`
 
-## How to use this
-You can modify `config.yaml` as you want.
-suggest you to check `config.yaml` before using ViTSTR.
+when you train, check & modify `config.yaml`
 
 before test or predict, you can use pre-trained model as follow;
-```bash
-mkdir saved_models && wget https://github.com/kwon-evan/ViTSTR/releases/download/v0.0.1/best.ckpt -P ./saved_models --no-check-certificate
-```
 
 ### Install
-```shell
+```bash
 python3 setup.py install
 ```
 
 ### Train
-```shell
+```bash
 python3 scripts/train.py
 ```
 
-### Test
-```shell
+### Inference
+```bash
+# using pytorch-lightning
 python3 scripts/test.py
-```
-
-### Predict
-
-```shell
 python3 scripts/predict.py
-```
-or
-```shell
-python3 scripts/predict_each.py
-```
 
-### Heatmap(Attention CAM)
-```shell
-python3 scripts/cam.py
+# using pytorch
+python3 scripts/demo.py
 ```
-
 -----------------
 
 ### Benchmarks (Top 1% accuracy)
