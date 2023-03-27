@@ -30,7 +30,7 @@ from vitstr.config import ModelConfig
 class TokenLabelConverter(object):
     """Convert between text-label and text-index"""
 
-    def __init__(self, opt, device):
+    def __init__(self, opt, device, kor):
         # character (str): set of the possible characters.
         # [GO] for the start token of the attention decoder. [s] for end-of-sentence token.
         self.SPACE = "[s]"
@@ -41,6 +41,7 @@ class TokenLabelConverter(object):
         self.dict = {word: i for i, word in enumerate(self.character)}
         self.batch_max_length = opt.batch_max_length + len(self.list_token)
         self.device = device
+        self.kor = kor
 
     def encode(self, text):
         """convert text-label into text-index."""
@@ -52,11 +53,30 @@ class TokenLabelConverter(object):
         )
         for i, t in enumerate(text):
             txt = [self.GO] + list(t) + [self.SPACE]
-            txt = [self.dict[char] for char in txt]
+            # txt = [self.dict[char] for char in txt]
+            txt = self._encode(txt)
             batch_text[i][: len(txt)] = torch.LongTensor(
                 txt
             )  # batch_text[:, 0] = [GO] token
         return batch_text.to(self.device)
+
+    def _encode(self, txt):
+        if self.kor:
+            encoded = []
+            j = 0
+            while j < len(txt):
+                k = len(txt)
+                while j < k and not "".join(txt[j:k]) in self.dict:
+                    k -= 1
+
+                if "".join(txt[j:k]) in self.dict:
+                    encoded.append(self.dict["".join(txt[j:k])])
+                    j = k
+                else:
+                    assert 0, "Error: Cannot encode text."
+            return encoded
+        else:
+            return [self.dict[char] for char in txt]
 
     def decode(self, text_index, length):
         """convert text-index into text-label."""
@@ -87,7 +107,7 @@ class ViTSTR(nn.Module):
         )
 
         self.character = self.opt.character
-        self.converter = TokenLabelConverter(self.opt, self.device)
+        self.converter = TokenLabelConverter(self.opt, self.device, self.opt.kor)
 
     @property
     def device(self):
@@ -156,8 +176,6 @@ class ViTSTR(nn.Module):
         opt: Union[ModelConfig, Namespace] = ModelConfig(),
         device: torch.device = torch.device("cpu"),
     ):
-        if opt.kor:
-            opt.character = "0123456789가강거경계고관광구금기김나남너노누다대더도동두등라러로루리마머명모무문미바배버보부북사산서소수시아악안양어연영오용우울원육이인자작저전조주중지차천초추충카타파평포하허호홀히"
         model = ViTSTR(opt)
         model.load_state_dict(torch.load(path, map_location=device)["state_dict"])
         model.to(device)
