@@ -36,16 +36,16 @@ if __name__ == "__main__":
     """load configuration"""
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     saved_model = Namespace(
-        **yaml.safe_load(open("scripts/components/config.yaml", "r"))
+        **yaml.safe_load(open("scripts/components/config-kor.yaml", "r"))
     ).saved_model
-    cfg = ModelConfig(kor=False)
+    cfg = ModelConfig(kor=True)
 
     """load model"""
     model = ViTSTR.load_from(saved_model, opt=cfg, device=device)
     print("Model Loaded!")
 
     """inference"""
-    paths = glob("demo_images/*.jpg")
+    paths = glob("demo_images_kor/*.jpg")
 
     results = []
     for path in track(paths):

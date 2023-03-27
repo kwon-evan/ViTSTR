@@ -1,12 +1,12 @@
 ### Training Configuration ###
-exp_name         : # Where to store logs and models
+exp_name         : "vitstr-korean-2" # Where to store logs and models
 data_root        : "/home/fourind/projects/datas/kor-datas/"
 manualSeed       : 230317                                   # for random seed setting
 workers          : 24                                     # number of data loading workers
 batch_size       : 128                                    # input batch size
 
 num_epoch        : 1000                                   # number of iterations to train for
-saved_model      : saved_models/ViTSTR-Seed230317/epoch=21-val-acc=95.539.ckpt                 # path to model to continue training
+saved_model      : saved_models/vitstr-korean-2/epoch=04-val-acc=95.335.ckpt                 # path to model to continue training
 adam             : false                                  # Whether to use adam (default is Adadelta)
 lr               : 1                                      # learning rate, default=1.0 for Adadelta
 beta1            : 0.9                                    # beta1 for adam. default=0.9

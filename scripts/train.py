@@ -26,16 +26,13 @@ warnings.filterwarnings(action="ignore")
 
 
 def train(opt):
-    cfg = ModelConfig()
+    cfg = ModelConfig(kor=True)
     # Merge config with opt
     for k, v in vars(cfg).items():
         if k not in vars(opt):
             setattr(opt, k, v)
-    if opt.kor:
-        kor_character = "0123456789가강거경계고관광구금기김나남너노누다대더도동두등라러로루리마머명모무문미바배버보부북사산서소수시아악안양어연영오용우울원육이인자작저전조주중지차천초추충카타파평포하허호홀히"
-        opt.character = kor_character
     opt.pretrained = True
-    print(opt)
+    opt.character = cfg.character
 
     dm = DataModule(opt)
     model = Model(opt)
@@ -84,8 +81,8 @@ def train(opt):
 
 
 if __name__ == "__main__":
-    """load configuration"""
-    opt = Namespace(**yaml.safe_load(open("scripts/components/config.yaml", "r")))
+    """load train configuration"""
+    opt = Namespace(**yaml.safe_load(open("scripts/components/config-kor.yaml", "r")))
 
     if not opt.exp_name:
         opt.exp_name = f"ViTSTR-Seed{opt.manualSeed}"
