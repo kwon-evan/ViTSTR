@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="ViTSTR",
-    version="0.0.5",
+    version="0.0.6",
     author="Heonjin Kwon",
     author_email="kwon@4ind.co.kr",
     description="ViTSTR written in pytorch-lightning",
