@@ -55,7 +55,7 @@ class Model(pl.LightningModule):
         # train part
         image, labels = batch
 
-        target = self.converter.encode(labels)
+        target = self.converter.encode(labels).to(next(self.parameters()).device)
         preds = self(image, seqlen=self.converter.batch_max_length)
         cost = self.criterion(
             preds.view(-1, preds.shape[-1]), target.contiguous().view(-1)
@@ -69,7 +69,7 @@ class Model(pl.LightningModule):
         batch_size = image.size(0)
 
         # For max length prediction
-        target = self.converter.encode(labels)
+        target = self.converter.encode(labels).to(next(self.parameters()).device)
 
         preds = self(image, seqlen=self.converter.batch_max_length)
         _, preds_index = preds.topk(1, dim=-1, largest=True, sorted=True)
