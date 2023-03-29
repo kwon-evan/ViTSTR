@@ -43,6 +43,8 @@ class Model(pl.LightningModule):
         self.converter = model.converter
         self.criterion = torch.nn.CrossEntropyLoss(ignore_index=0)  # ignore [GO]
 
+        self.validation_step_outputs = []
+
         self.save_hyperparameters(self.opt)
 
     def forward(self, input, seqlen=25):
@@ -85,9 +87,11 @@ class Model(pl.LightningModule):
         preds_str = self.converter.decode(preds_index[:, 1:], length_for_pred)
 
         self.log("val-loss", cost, prog_bar=True, batch_size=self.opt.batch_size)
-        return preds, preds_str, labels
+        self.validation_step_outputs.append((preds, preds_str, labels))
+        # return preds, preds_str, labels
 
-    def validation_epoch_end(self, outputs):
+    def on_validation_epoch_end(self):
+        outputs = self.validation_step_outputs
         preds = []
         preds_str = []
         labels = []
@@ -149,6 +153,7 @@ class Model(pl.LightningModule):
             prog_bar=True,
             batch_size=self.opt.batch_size,
         )
+        self.validation_step_outputs.clear()
 
     def test_step(self, batch, batch_idx):
         image, labels = batch
