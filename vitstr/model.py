@@ -162,7 +162,7 @@ class ViTSTR(nn.Module):
             pred = pred[:pred_EOS]  # prune after "end of sentence" token ([s])
             pred_max_prob = pred_max_prob[:pred_EOS]
 
-            if len(confidence_score) == 0:
+            if len(pred_max_prob) == 0:
                 confidence_score = 0
             else:
                 confidence_score = confidence_score[-1]
