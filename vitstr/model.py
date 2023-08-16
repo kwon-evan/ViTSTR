@@ -165,7 +165,7 @@ class ViTSTR(nn.Module):
             if len(pred_max_prob) == 0:
                 confidence_score = 0
             else:
-                confidence_score = confidence_score[-1]
+                confidence_score = pred_max_prob.cumprod(dim=0)[-1]
             
         return pred.upper(), confidence_score
 
