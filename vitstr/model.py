@@ -155,31 +155,37 @@ class ViTSTR(nn.Module):
         preds_prob = F.softmax(preds, dim=2)
         preds_max_prob, _ = preds_prob.max(dim=2)
 
-        pred = None
-        confidence_score = None
+        pred = ""
+        confidence_score = 0.0
         for pred, pred_max_prob in zip(preds_str, preds_max_prob):
             pred_EOS = pred.find("[s]")
             pred = pred[:pred_EOS]  # prune after "end of sentence" token ([s])
             pred_max_prob = pred_max_prob[:pred_EOS]
+            confidence_score = pred_max_prob.cumprod(dim=0)
 
-            # calculate confidence score (= multiply of pred_max_prob)
-            try:
-                confidence_score = pred_max_prob.cumprod(dim=0)[-1]
-            except:
-                confidence_score = 0  # for empty pred case, when prune after "end of sentence" token ([s])
+            if len(confidence_score) == 0:
+                confidence_score = 0
+            else:
+                confidence_score = confidence_score[-1]
 
-        return pred.upper(), confidence_score.item()
+            # # calculate confidence score (= multiply of pred_max_prob)
+            # try:
+            #     confidence_score = pred_max_prob.cumprod(dim=0)[-1]
+            # except:
+            #     confidence_score = 0  # for empty pred case, when prune after "end of sentence" token ([s])
 
-    @staticmethod
+        return pred.upper(), confidence_score
+
+    @classmethod
     def load_from(
+        cls,
         path: str,
         opt: Union[ModelConfig, Namespace] = ModelConfig(),
         device: torch.device = torch.device("cpu"),
     ):
-        model = ViTSTR(opt)
+        model = cls(opt)
         model.load_state_dict(torch.load(path, map_location=device)["state_dict"])
-        model.to(device)
-        model.eval()
+        model.to(device).eval()
 
         # warm-up
         model.imread(Image.new("RGB", (100, 32), (255, 255, 255)))

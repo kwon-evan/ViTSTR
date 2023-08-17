@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="ViTSTR",
-    version="0.0.6",
+    version="0.0.7",
     author="Heonjin Kwon",
     author_email="kwon@4ind.co.kr",
     description="ViTSTR written in pytorch-lightning",
@@ -15,5 +15,5 @@ setup(
         "Programming Language :: Python :: 3",
         "Operating System :: OS Independent",
     ],
-    python_requires=">=3.0",
+    python_requires=">=3.7",
 )
