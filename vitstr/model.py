@@ -163,17 +163,11 @@ class ViTSTR(nn.Module):
             pred_max_prob = pred_max_prob[:pred_EOS]
             confidence_score = pred_max_prob.cumprod(dim=0)
 
-            if len(confidence_score) == 0:
+            if len(pred_max_prob) == 0:
                 confidence_score = 0
             else:
-                confidence_score = confidence_score[-1]
-
-            # # calculate confidence score (= multiply of pred_max_prob)
-            # try:
-            #     confidence_score = pred_max_prob.cumprod(dim=0)[-1]
-            # except:
-            #     confidence_score = 0  # for empty pred case, when prune after "end of sentence" token ([s])
-
+                confidence_score = pred_max_prob.cumprod(dim=0)[-1]
+            
         return pred.upper(), confidence_score
 
     @classmethod
