@@ -1,7 +1,7 @@
 """
 Implementation of ViTSTR based on timm VisionTransformer.
 
-TODO: 
+TODO:
 1) distilled deit backbone
 2) base deit backbone
 
@@ -57,6 +57,7 @@ class ViTSTR(VisionTransformer):
 
     def __init__(self, *args, **kwargs):
         del kwargs["pretrained_cfg"]
+        del kwargs["pretrained_cfg_overlay"]
         super().__init__(*args, **kwargs)
 
     def reset_classifier(self, num_classes):
@@ -177,7 +178,7 @@ def vitstr_tiny_patch16_224(pretrained=False, **kwargs):
         num_heads=3,
         mlp_ratio=4,
         qkv_bias=True,
-        **kwargs
+        **kwargs,
     )
 
     model.default_cfg = _cfg(
@@ -205,7 +206,7 @@ def vitstr_small_patch16_224(pretrained=False, **kwargs):
         num_heads=6,
         mlp_ratio=4,
         qkv_bias=True,
-        **kwargs
+        **kwargs,
     )
     model.default_cfg = _cfg(
         # url="https://github.com/roatienza/public/releases/download/v0.1-deit-small/deit_small_patch16_224-cd65a155.pth"
@@ -231,7 +232,7 @@ def vitstr_base_patch16_224(pretrained=False, **kwargs):
         num_heads=12,
         mlp_ratio=4,
         qkv_bias=True,
-        **kwargs
+        **kwargs,
     )
     model.default_cfg = _cfg(
         # url='https://github.com/roatienza/public/releases/download/v0.1-deit-base/deit_base_patch16_224-b5f2ef4d.pth'
@@ -259,7 +260,7 @@ def vitstr_tiny_distilled_patch16_224(pretrained=False, **kwargs):
         num_heads=3,
         mlp_ratio=4,
         qkv_bias=True,
-        **kwargs
+        **kwargs,
     )
     model.default_cfg = _cfg(
         url="https://dl.fbaipublicfiles.com/deit/deit_tiny_distilled_patch16_224-b40b3cf7.pth"
@@ -286,7 +287,7 @@ def vitstr_small_distilled_patch16_224(pretrained=False, **kwargs):
         num_heads=6,
         mlp_ratio=4,
         qkv_bias=True,
-        **kwargs
+        **kwargs,
     )
     model.default_cfg = _cfg(
         url="https://dl.fbaipublicfiles.com/deit/deit_small_distilled_patch16_224-649709d9.pth"
@@ -312,7 +313,7 @@ def vitstr_base_distilled_patch16_224(pretrained=False, **kwargs):
         num_heads=6,
         mlp_ratio=4,
         qkv_bias=True,
-        **kwargs
+        **kwargs,
     )
     model.default_cfg = _cfg(
         url="https://dl.fbaipublicfiles.com/deit/deit_base_distilled_patch16_224-df68dfff.pth"
